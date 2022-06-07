@@ -9,7 +9,17 @@ const UIroute = require("./UI/uiRouter");
 const pageRoute = require("./pages/Page_route");
 const PORT = process.env.PORT || 5000;
 app.use(express.json());
-app.use(cors());
+
+// app.use(cors());
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    callback(null, true);
+  },
+};
+
+corsOptions.credentials = true;
+app.use(cors(corsOptions));
 
 // template engine
 app.use("/resources", express.static(path.join(__dirname, "public")));
@@ -30,10 +40,10 @@ app.set("view engine", "hbs");
 app.use("/", UIroute);
 app.use("/pages", pageRoute);
 
-app.get("/", (req, res) => {
-  console.log("home");
-  res.render("HomePage", { title: "webpage builder" });
-});
+// app.get("/", (req, res) => {
+//   console.log("home");
+//   res.render("HomePage", { title: "webpage builder" });
+// });
 
 app.listen(PORT, () => {
   console.log("server is up!");

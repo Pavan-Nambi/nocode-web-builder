@@ -1,19 +1,40 @@
-import React, { useState } from "react";
-
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { API_URL, new_page } from "./API";
+import { Link } from "react-router-dom";
 function Home() {
   const [pages, setPages] = useState([]);
   const [name, setName] = useState("");
   const [isValid, setIsValid] = useState(true);
-  const onSave = () => {
+  const [error, setError] = useState("");
+
+  const onSave = async () => {
     if (!name) {
       setIsValid(false);
       return;
     }
+    const newPage = await new_page(name);
+    setName("");
+    setPages([...pages, newPage]);
   };
+  useEffect(() => {
+    async function getEveryPageFromAPI() {
+      try {
+        const response = await axios.get(API_URL);
+        setPages(response.data);
+        console.log(response.data);
+      } catch (error) {
+        console.log("error is =>>", error);
+        setError(error.message);
+      }
+    }
+    getEveryPageFromAPI();
+  }, []);
+
   return (
     <div className="p-3 mb-2 bg-secondary text-white">
       <div className="col-12 mt-5">
-        <form id="create-page" onsubmit="return validatForm(event)" novalidate>
+        <form id="create-page" noValidate>
           <h5>
             Create Page (you can just type name of page below and click save)
           </h5>
@@ -42,7 +63,6 @@ function Home() {
               type="button"
               className="btn  btn-sm"
               data-bs-dismiss="modal"
-              onclick="clearForm()"
             >
               Clear
             </button>
@@ -57,6 +77,11 @@ function Home() {
         </form>
       </div>
       <div className="col-12 my-2">
+        {error && (
+          <div role="alert" className="alert alert-primary">
+            {error}
+          </div>
+        )}
         <table className="table table-bordered table-hover">
           <thead>
             <tr>
@@ -69,12 +94,13 @@ function Home() {
           <tbody>
             {pages
               ? pages.map((page) => (
-                  <tr>
+                  <tr key={page._id}>
                     <td>{page._id}</td>
                     <td>{page.name}</td>
                     <td>{page.slug}</td>
                     <td>
-                      <a href={`/api/editor/${this._id}`}>Edit</a>
+                      <Link to={`/editor/${page._id}`}>Edit</Link>
+                      {console.log("page id is", page._id)}
                     </td>
                   </tr>
                 ))

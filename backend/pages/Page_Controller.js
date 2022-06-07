@@ -14,6 +14,7 @@ const create = async (req, res) => {
 };
 const details = async (req, res) => {
   const { pageId } = req.params;
+  console.log("page id", pageId);
   const details = await pageDetails(pageId);
   res.json(details);
 };
@@ -21,6 +22,7 @@ const details = async (req, res) => {
 const list = async (req, res) => {
   const pages = await listPages();
   res.json(pages);
+  console.log(pages);
 };
 
 const deletePageRecord = async (req, res) => {
@@ -43,6 +45,12 @@ const changeContent = async (req, res) => {
   const pageContent = await savePageContent(pageId, pageBody);
   res.json(pageContent);
 };
+const loadContent = async (req, res) => {
+  const { pageId } = req.params;
+  res.header("Content-Type", "application/json");
+  const pageData = await pageDetails(pageId);
+  res.json(pageData.content);
+};
 
 module.exports = {
   create,
@@ -51,4 +59,5 @@ module.exports = {
   deletePageRecord,
   update,
   changeContent,
+  loadContent,
 };
